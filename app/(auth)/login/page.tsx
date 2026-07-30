@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { loginSchema, type LoginInput } from "@/validators/auth";
 
-// ১. মেইন ফর্ম এবং লজিক এই কম্পোনেন্টে থাকবে
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,7 +50,6 @@ function LoginForm() {
 
   return (
     <div className="animate-slide-up">
-      {/* Icon badge */}
       <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-emerald-600 text-white shadow-lg shadow-primary-500/20 ring-4 ring-primary-500/10">
         <ShieldCheck className="h-5.5 w-5.5" />
       </div>
@@ -63,7 +61,6 @@ function LoginForm() {
         Sign in to continue to your workspace.
       </p>
 
-      {/* Card wrapper */}
       <div className="mt-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/50 backdrop-blur-xl p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-12px_rgba(15,23,42,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_12px_32px_-12px_rgba(0,0,0,0.5)]">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
@@ -107,7 +104,6 @@ function LoginForm() {
         </form>
       </div>
 
-      {/* Divider */}
       <div className="mt-6 flex items-center gap-3">
         <span className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent" />
         <span className="text-xs font-medium text-slate-400">New here?</span>
@@ -129,10 +125,9 @@ function LoginForm() {
   );
 }
 
-// ২. মেইন পেজ যা LoginForm-কে Suspense দিয়ে রেন্ডার করবে
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20 text-slate-400">Loading workspace...</div>}>
+    <Suspense fallback={null}>
       <LoginForm />
     </Suspense>
   );
