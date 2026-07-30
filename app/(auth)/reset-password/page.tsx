@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/validators/auth";
 
-export default function ResetPasswordPage() {
+// ১. useSearchParams() সহ মূল ফর্ম ও লজিক এখানে
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
@@ -87,5 +88,20 @@ export default function ResetPasswordPage() {
         <ArrowLeft className="h-3.5 w-3.5" /> Back to sign in
       </Link>
     </div>
+  );
+}
+
+// ২. মেইন পেজ যা ResetPasswordForm-কে Suspense দিয়ে রেন্ডার করবে
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20 text-slate-400">
+          Loading...
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
