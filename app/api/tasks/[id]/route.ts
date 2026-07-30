@@ -7,8 +7,9 @@ import { taskUpdateSchema } from "@/validators/task";
 import { apiError, apiSuccess } from "@/lib/utils";
 import mongoose from "mongoose";
 
+// Params ইন্টারফেসটি আপডেট করা হয়েছে
 interface Params {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function getOwnedTask(id: string, userId: string) {
@@ -21,8 +22,11 @@ export async function GET(_req: NextRequest, { params }: Params) {
     const session = await getServerSession(authOptions);
     if (!session?.user) return apiError("Unauthorized", 401);
 
+    // params-কে await করতে হবে
+    const { id } = await params;
+
     await connectDB();
-    const task = await getOwnedTask(params.id, (session.user as { id: string }).id);
+    const task = await getOwnedTask(id, (session.user as { id: string }).id);
     if (!task) return apiError("Task not found", 404);
 
     return apiSuccess(task, "Task fetched");
@@ -37,6 +41,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     const session = await getServerSession(authOptions);
     if (!session?.user) return apiError("Unauthorized", 401);
 
+    // params-কে await করতে হবে
+    const { id } = await params;
+
     const body = await req.json();
     const parsed = taskUpdateSchema.safeParse(body);
     if (!parsed.success) {
@@ -44,12 +51,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     await connectDB();
-    const task = await getOwnedTask(params.id, (session.user as { id: string }).id);
+    const task = await getOwnedTask(id, (session.user as { id: string }).id);
     if (!task) return apiError("Task not found", 404);
 
     Object.assign(task, parsed.data);
 
-    // Track completion timestamp for analytics/streaks
     if (parsed.data.status === "completed" && !task.completedAt) {
       task.completedAt = new Date();
     } else if (parsed.data.status && parsed.data.status !== "completed") {
@@ -69,12 +75,15 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     const session = await getServerSession(authOptions);
     if (!session?.user) return apiError("Unauthorized", 401);
 
+    // params-কে await করতে হবে
+    const { id } = await params;
+
     await connectDB();
-    const task = await getOwnedTask(params.id, (session.user as { id: string }).id);
+    const task = await getOwnedTask(id, (session.user as { id: string }).id);
     if (!task) return apiError("Task not found", 404);
 
     await task.deleteOne();
-    return apiSuccess({ id: params.id }, "Task deleted");
+    return apiSuccess({ id }, "Task deleted");
   } catch (err) {
     console.error("[TASK_DELETE_ERROR]", err);
     return apiError("Failed to delete task", 500);
