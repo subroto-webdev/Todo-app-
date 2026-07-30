@@ -6,15 +6,27 @@ import Task from "@/models/Task";
 import { apiError, apiSuccess } from "@/lib/utils";
 import mongoose from "mongoose";
 
-export async function POST(_req: NextRequest, { params }: { params: { id: string } }) {
+// params-কে Promise<{ id: string }> হিসেবে টাইপ করা হয়েছে
+export async function POST(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) return apiError("Unauthorized", 401);
-    if (!mongoose.Types.ObjectId.isValid(params.id)) return apiError("Invalid task id", 400);
+
+    // Next.js 15 এ params-কে await করতে হয়
+    const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return apiError("Invalid task id", 400);
+    }
 
     await connectDB();
     const userId = (session.user as { id: string }).id;
-    const original = await Task.findOne({ _id: params.id, userId }).lean();
+
+    // params.id এর বদলে সরাসরি id ব্যবহার করা হয়েছে
+    const original = await Task.findOne({ _id: id, userId }).lean();
     if (!original) return apiError("Task not found", 404);
 
     const { _id, createdAt, updatedAt, ...rest } = original as any;
