@@ -66,31 +66,31 @@ export function TaskFormModal() {
       reset(
         editingTask
           ? {
-              title: editingTask.title,
-              description: editingTask.description ?? "",
-              priority: editingTask.priority,
-              tags: editingTask.tags ?? [],
-              dueDate: editingTask.dueDate ? editingTask.dueDate.slice(0, 10) : "",
-              status: editingTask.status,
-              pinned: editingTask.pinned,
-              favorite: editingTask.favorite,
-              subtasks: editingTask.subtasks ?? [],
-              checklist: editingTask.checklist ?? [],
-              recurrence: editingTask.recurrence ?? "none",
-              estimatedMinutes: editingTask.estimatedMinutes ?? undefined,
-            }
+            title: editingTask.title,
+            description: editingTask.description ?? "",
+            priority: editingTask.priority,
+            tags: editingTask.tags ?? [],
+            dueDate: editingTask.dueDate ? (editingTask.dueDate as string).slice(0, 10) : "",
+            status: editingTask.status,
+            pinned: editingTask.pinned,
+            favorite: editingTask.favorite,
+            subtasks: editingTask.subtasks ?? [],
+            checklist: editingTask.checklist ?? [],
+            recurrence: editingTask.recurrence ?? "none",
+            estimatedMinutes: editingTask.estimatedMinutes ?? undefined,
+          }
           : {
-              title: "",
-              description: "",
-              priority: "medium",
-              tags: [],
-              status: "pending",
-              pinned: false,
-              favorite: false,
-              subtasks: [],
-              checklist: [],
-              recurrence: "none",
-            }
+            title: "",
+            description: "",
+            priority: "medium",
+            tags: [],
+            status: "pending",
+            pinned: false,
+            favorite: false,
+            subtasks: [],
+            checklist: [],
+            recurrence: "none",
+          }
       );
     }
   }, [taskModalOpen, editingTask, reset]);
@@ -101,12 +101,13 @@ export function TaskFormModal() {
 
   const onSubmit = async (values: TaskInput) => {
     try {
-      if (editingTask) {
-        const updated = await taskService.update(editingTask._id, values);
-        updateTask(editingTask._id, updated);
+      if (editingTask && editingTask._id) {
+        // এখানে 'as any' ব্যবহার করা হয়েছে টাইপ এরর এড়াতে
+        const updated = await taskService.update(editingTask._id as string, values as any);
+        updateTask(editingTask._id as string, updated);
         toast.success("Task updated");
       } else {
-        const created = await taskService.create(values);
+        const created = await taskService.create(values as any);
         addTask(created);
         toast.success("Task created");
       }
