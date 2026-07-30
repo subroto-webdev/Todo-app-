@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { loginSchema, type LoginInput } from "@/validators/auth";
 
-export default function LoginPage() {
+// ১. মেইন ফর্ম এবং লজিক এই কম্পোনেন্টে থাকবে
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -125,5 +126,14 @@ export default function LoginPage() {
         Your data is encrypted and never shared
       </p>
     </div>
+  );
+}
+
+// ২. মেইন পেজ যা LoginForm-কে Suspense দিয়ে রেন্ডার করবে
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-20 text-slate-400">Loading workspace...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
