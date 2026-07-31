@@ -340,15 +340,14 @@ function LoginForm() {
 
   const isBusy = loading || redirecting;
 
-  const { onKeyUp: passwordOnKeyUp, ...passwordField } = register("password");
+  const passwordField = register("password");
   const emailField = register("email");
 
   const handlePasswordKeyUp = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       setCapsLockOn(e.getModifierState?.("CapsLock") ?? false);
-      passwordOnKeyUp?.(e);
     },
-    [passwordOnKeyUp]
+    []
   );
 
   return (
